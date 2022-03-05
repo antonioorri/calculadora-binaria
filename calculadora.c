@@ -6,39 +6,69 @@
 #define MIN 0
 
 
-union Dato{
-            int dato; // operando o resultado para hexadecimal
-            char dato_binario[9]; //cadena para almacenar el operando/resultado
-                                    //binario
-            char operacion[10]; // cadena descriptiva de la operacion
-        }contenido;
+
 
 typedef struct Nodo{
 
-    union Dato d;
+    int op1,op2,res;
+    char operacion[5];
     struct Nodo * siguiente;
 }Nodo;
 
 typedef struct Lista{
     Nodo * cabeza;
+    int n_nodos;
 }Lista;
 
-Nodo * CrearNodo(union Dato* dato){
+Nodo * CrearNodo(Nodo * new_node){
     Nodo* nodo= (Nodo *)malloc(sizeof(Nodo));
-    nodo.d -> dato;
+    nodo->op1 =new_node->op1;
+    nodo->op2 =new_node->op2;
+    nodo->res =new_node->res;
+    strcpy(nodo->operacion,new_node->operacion);
     nodo->siguiente=NULL;
     return nodo;
+}
+int EstaVacia(Lista *lista){
+    return lista->cabeza ==NULL;
 }
 
 void DestruirNodo(Nodo* nodo){
     free(nodo);
 }
 
-void Insertar_Nodo(Lista * lista,Nodo * nodo){
-    Nodo * nodo=CrearNodo();
-
+void Insertar_Nodo(Lista * lista,Nodo * new_node){
+    Nodo * nodo=CrearNodo(new_node);
+    if(lista->cabeza== NULL)
+        lista->cabeza=nodo;
+    else{
+        Nodo* puntero = lista->cabeza;
+        while(puntero->siguiente){
+            puntero=puntero->siguiente;
+        }
+        puntero->siguiente=nodo;
+    }
+    lista->n_nodos++;
+    printf("Se ha insertado el nodo\n");
 }
 
+void mostrar_lista(Lista * lista){
+    Nodo *aux=lista->cabeza;
+    while(aux->siguiente){
+        printf("%d %s %d = %d\n",aux->op1,*aux->operacion,aux->op2,aux->res);
+        aux= aux->siguiente;
+    }
+    DestruirNodo(aux);
+}
+
+void borrar_lista(Lista *lista){
+    Nodo * aux=NULL;
+    while(lista->cabeza){
+         aux= lista->cabeza;
+        lista->cabeza=lista->cabeza->siguiente;
+        DestruirNodo(aux);
+    }
+}
 
 
 
@@ -96,7 +126,7 @@ void leer_operandos_x(int *n1, int *n2){
 }
 
 
-void calculadora_1(int seleccionado, int x, int y, int  res){
+void calculadora_1(int seleccionado, int x, int y, int  res,Lista * l,int m){
 
     switch(seleccionado){
 			case 1:
@@ -121,28 +151,33 @@ void calculadora_1(int seleccionado, int x, int y, int  res){
                 res= x >> y;
                 printf("%d >> %d = %d.\n",x,y,res);
 			break;
-			case 7:
-
-			break;
-			case 8:
-
-			break;
-			case 9:
-
-			break;
-			case 10:
-
-			break;
 
 			default:
 				seleccionado =  0;
 				printf("Hasta pronto :).\n");
 			break;
 		}
+		if(m && seleccionado){
+                Nodo *n;
+                n->op1=x;
+                n->op2=y;
+                n->res=res;
+                if(seleccionado==1)
+                    strcpy(n->operacion,"OR");
+                if(seleccionado==2)
+                    strcpy(n->operacion,"AND");
+                if(seleccionado==3)
+                    strcpy(n->operacion,"XOR");
+                if(seleccionado==4)
+                    strcpy(n->operacion,"<<");
+                else strcpy(n->operacion,">>");
+
+                Insertar_Nodo(l,n);
+		}
 }
 
 
-void calculadora_2(int seleccionado, int x, int y, int  res){
+void calculadora_2(int seleccionado, int x, int y, int  res,Lista * l,int m){
 
     int n1=binario_decimal(x);
     int n2=binario_decimal(y);
@@ -179,9 +214,26 @@ void calculadora_2(int seleccionado, int x, int y, int  res){
 				printf("Hasta pronto :).\n");
 			break;
 		}
+		if(m && seleccionado){
+                Nodo *n;
+                n->op1=n1;
+                n->op2=n2;
+                n->res=res;
+                if(seleccionado==1)
+                    strcpy(n->operacion,"OR");
+                if(seleccionado==2)
+                    strcpy(n->operacion,"AND");
+                if(seleccionado==3)
+                    strcpy(n->operacion,"XOR");
+                if(seleccionado==4)
+                    strcpy(n->operacion,"<<");
+                else strcpy(n->operacion,">>");
+
+                Insertar_Nodo(l,n);
+		}
 }
 
-void calculadora_3(int seleccionado, int x, int y, int  res){
+void calculadora_3(int seleccionado, int x, int y, int  res,Lista * l,int m){
 
     switch(seleccionado){
 			case 1:
@@ -207,27 +259,47 @@ void calculadora_3(int seleccionado, int x, int y, int  res){
                 printf("0x%x >> 0x%x = 0x%x.\n",x,y,res);
 			break;
 		}
+		if(m && seleccionado){
+                Nodo *n;
+                n->op1=x;
+                n->op2=y;
+                n->res=res;
+                if(seleccionado==1)
+                    strcpy(n->operacion,"OR");
+                if(seleccionado==2)
+                    strcpy(n->operacion,"AND");
+                if(seleccionado==3)
+                    strcpy(n->operacion,"XOR");
+                if(seleccionado==4)
+                    strcpy(n->operacion,"<<");
+                else strcpy(n->operacion,">>");
+
+                Insertar_Nodo(l,n);
+		}
 }
 
 int main(){
+    Lista * l=NULL;
+
 
 	int seleccionado=1;
-	int x,y,res,base;
+	int x,y,res,base,memoria=0;
 	//mostrar_menu();
 	while(seleccionado){
 
 		mostrar_menu1();
 		mostrar_menu2();
 		do{
+            printf("Introduzca operacion: ");
 			scanf("%d",&seleccionado);
 			if(seleccionado<MIN || seleccionado >MAX){
                 printf("ERROR. Vuelva a introducir la opercacion.\n");
 			}
 		}while(seleccionado<MIN || seleccionado >MAX);
-		if(seleccionado && seleccionado!=6){//por si es 0
+		if(seleccionado && seleccionado<6){//por si es 0
            leer_operandos(&x,&y);
           // printf("%d\n",y);printf("%d\n",x);
-          calculadora_1(seleccionado,x,y,res);
+          calculadora_1(seleccionado,x,y,res,l,memoria);
         }
 
         if(seleccionado==6){
@@ -240,18 +312,35 @@ int main(){
                 leer_operandos(&x,&y);
                 do{
 
-                mostrar_menu1();
+                    mostrar_menu1();
                     scanf("%d",&seleccionado);
                     if(seleccionado<MIN || seleccionado >5){
                         printf("ERROR. Vuelva a introducir la opercacion.\n");
                     }
                 }while(seleccionado<MIN || seleccionado >5);
-                calculadora_2(seleccionado,x,y,res);
+                calculadora_2(seleccionado,x,y,res,l,memoria);
             }else{
                 leer_operandos_x(&x,&y);
                 mostrar_menu1();
                 scanf("%d",&seleccionado);
-                calculadora_3(seleccionado,x,y,res);
+                calculadora_3(seleccionado,x,y,res,l,memoria);
+            }
+        }else{
+            switch(seleccionado){
+                case 7:
+                    memoria=1;
+                    printf("Se ha habilitado la memoria.\n");
+                break;
+                case 8:
+                    memoria=0;
+                    printf("Se ha deshabilitado la memoria.\n");
+                break;
+                case 9:
+                    borrar_lista(l);
+                break;
+                case 10:
+                    mostrar_lista(l);
+                break;
             }
         }
 	}
