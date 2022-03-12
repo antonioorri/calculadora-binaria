@@ -1,0 +1,39 @@
+#include <stdio.h>
+#include <string.h>
+#include <stdlib.h>
+
+void DecToBin(int num,char * res){
+
+
+    int i=0;
+    int x = num;
+
+    while(x>0){
+        x=x/2;
+        i++;
+    }
+    printf("%d",i);
+    while(i>0){
+
+        res[i]= (num%2) + '0';
+        printf(" %c ",res[i]);
+        num=num/2;
+        i--;
+    }
+}
+int binToDecima( char * num){
+    char * t;
+    return strtol(num,&t,2);
+}
+
+
+
+int main(){
+
+
+    char xy[20]="";
+    DecToBin(20,xy);
+    printf("res: %s",xy);
+
+
+}
