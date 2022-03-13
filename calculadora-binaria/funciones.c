@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
-
+#include "lista.h"
 
 
 
@@ -28,12 +28,12 @@ int DES_RIGTH(int n1,int n2){
 void mostrar_menu1(){
     printf("---------------------------------------------------------------------------------------------------------\n");
     printf("Seleccione una operacion.\n");
-	printf("1.-OR lÛgico\n");
-	printf("2.-AND lÛgico\n");
-	printf("3.-XOR lÛgico\n");
+	printf("1.-OR lÔøΩgico\n");
+	printf("2.-AND lÔøΩgico\n");
+	printf("3.-XOR lÔøΩgico\n");
 	printf("4.-<<(desplazamiento a la izquierda)\n");
 	printf("5.->>(desplazamiento a la derecha)\n");
-	printf("6.Cambio de formato (0->binario, 1->hexadecimal). Una vez seleccionado un formato determinado, los operandos se interpretar·n en ese nuevo formato, al igual que los resulatados.\n");
+	printf("6.Cambio de formato (0->binario, 1->hexadecimal). Una vez seleccionado un formato determinado, los operandos se interpretarÔøΩn en ese nuevo formato, al igual que los resulatados.\n");
 	printf("7.-Habilitar memoria.\n");
 	printf("8.-Deshabilitar memoria.\n");
 	printf("9.-Borrar memoria.\n");
@@ -45,19 +45,19 @@ void mostrar_menu1(){
 
 
 void leer_operandos_hex(int *n1, int *n2){
-    printf("Introduzca operando 1 en hexadecimal: \n");
+    printf("Introduzca operando 1 en hexadecimal: ");
     scanf("%x",n1);
   //  printf("%d\n",*n1);
-    printf("Introduzca operando 2 en hexadecimal: \n");
+    printf("Introduzca operando 2 en hexadecimal: ");
     scanf("%x",n2);
   //  printf("%d\n",*n2);
 }
 
 void leer_operandos_bin(char *n1, char *n2){
-    printf("Introduzca operando 1 en binario: \n");
-    sscanf("%s",n1);
+    printf("Introduzca operando 1 en binario: ");
+    scanf("%s",n1);
   //  printf("%d\n",*n1);
-    printf("Introduzca operando 2 en binario: \n");
+    printf("Introduzca operando 2 en binario: ");
     scanf("%s",n2);
   //  printf("%d\n",*n2);
 }
@@ -82,42 +82,74 @@ int decimal_binario(int x){
 }
 */
 
-void DecToBin(const int num,char * res){
-
-    char res2[20];
+void DecToBin(int num,char * res){
+    //res2 era una prueba
+    //char res2[20];
+    //printf("Numero a transformar en binario: %d\n",num);
     int i=0;
     int x = num;
-
+    //printf("DEBUG\n");
     while(x>0){
         x=x/2;
         i++;
     }
-    printf("%d\n",i);
-    res2[i]='\0';
+    //printf("%d\n",i);
+    res[i]='\0';
     x=num;
     while(i>0){
 
-        res2[i-1]= (num%2) + '0';
-        printf("%c",res2[i]);
+        res[i-1]= (x%2) + '0';
+        //printf("%c ",res[i]);
         x=x/2;
         i--;
 
     }
-    printf("%s\n",res2);
-    strcpy(res,res2);
+    //printf("\n");
+    //printf("numero transformado en binario : %s\n",res);
+    //strcpy(res,res2);
+    //printf("DEBUG, ha terminado de pasar a binario.\n");
 }
+void intToChar(int num,char * res){
+    //res2 era una prueba
+    //char res2[20];
+    //printf("Numero a transformar en binario: %d\n",num);
+    int i=0;
+    int x = num;
+    //printf("DEBUG\n");
+    while(x>0){
+        x=x/10;
+        i++;
+    }
+    //printf("%d\n",i);
+    res[i]='\0';
+    x=num;
+    while(i>0){
 
+        res[i-1]= (x%10) + '0';
+        //printf("%c ",res[i]);
+        x=x/10;
+        i--;
+
+    }
+    //printf("\n");
+    //printf("numero transformado en binario : %s\n",res);
+    //strcpy(res,res2);
+    //printf("DEBUG, ha terminado de pasar a binario.\n");
+}
 
 int binToDecima( char * num){
     char * t;
+    //printf("numero a transformar en decimal : %s\n",num);
     return strtol(num,&t,2);
 }
 
 
 
 
-void calculadora_1(int seleccionado, int x, int y, int  res,int m){
-
+void calculadora_1(int seleccionado, int x, int y, int  res,int m,Lista * l){
+    //printf("DEBUG, CALCULADORA HEXADECIMAL.\n");
+    Nodo * n;
+    
     switch(seleccionado){
 			case 1:
 			  //  printf("%d\n",y);printf("%d\n",x);
@@ -143,26 +175,43 @@ void calculadora_1(int seleccionado, int x, int y, int  res,int m){
 			break;
 
 			default:
-				seleccionado =  0;
 				printf("Hasta pronto :).\n");
 			break;
 		}
+        if(m==1){
+            
+            n=CrearNodo_1(res);
+            Insertar_Nodo(l,n);
+        }
+        //printf("DEBUGGING\n");
+        
+/*
+        if(m){
+            printf("DEBUGGING\n");
+            Nodo * n = CrearNodo_1(res);
+            Insertar_Nodo(l,n);
+        }
+        */
 }
 
 
-void calculadora_2(int seleccionado, int n1, int n2, char *  res,int m){
-    char* x,y;
-    DecToBin(n1,x);
+void calculadora_2(int seleccionado, int n1, int n2, char *  res,int m,Lista * l){
+    char x[9];
+    char y[9];
+    //printf("DEBUG, CALCULADORA BINARIA.\n");
+	DecToBin(n1,x);
     DecToBin(n2,y);
+   // printf("LLEGARA HASTA AQU√ç?");
     switch(seleccionado){
 			case 1:
 			  //  printf("%d\n",y);printf("%d\n",x);
 			    DecToBin((n1|n2),res);
+                //printf("LLEGARA HASTA AQU√ç?");
                 printf("0b%s OR 0b%s = 0b%s .\n",x,y,res);
+               // printf("LLEGARA HASTA AQU√ç?");
 			break;
 			case 2:
 			    DecToBin((n1 & n2),res);
-
                 printf("0b%s AND 0b%s = 0b%s.\n",x,y,res);
             break;
 			case 3:
@@ -182,24 +231,16 @@ void calculadora_2(int seleccionado, int n1, int n2, char *  res,int m){
 				seleccionado =  0;
 				printf("Hasta pronto :).\n");
 			break;
+            //printf("LLEGARA HASTA AQU√ç?");
 		}
-		/*
-		if(m && seleccionado){
-                Nodo *n;
-                n->op1=n1;
-                n->op2=n2;
-                n->res=res;
-                if(seleccionado==1)
-                    strcpy(n->operacion,"OR");
-                if(seleccionado==2)
-                    strcpy(n->operacion,"AND");
-                if(seleccionado==3)
-                    strcpy(n->operacion,"XOR");
-                if(seleccionado==4)
-                    strcpy(n->operacion,"<<");
-                else strcpy(n->operacion,">>");
-
-                Insertar_Nodo(l,n);
-		}
-		*/
+       // printf("LLEGARA HASTA AQU√ç?");
+        /*
+    if(m && seleccionado){
+        //Nodo * n = ;
+        Insertar_Nodo(l,CrearNodo_2(res));
+    }
+        *//*
+       if(m){
+           Insertar_Nodo(l,CrearNodo_2(res));
+       }*/
 }

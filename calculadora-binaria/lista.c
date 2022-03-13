@@ -1,17 +1,22 @@
-#include <stdio.h>
 
+#include "lista.h"
 
-typedef struct Lista{
-    Nodo * cabeza;
-    int n_nodos;
-}Lista;
-
-Nodo * CrearNodo(Nodo * new_node){
+Nodo * CrearNodo_1(int d){
     Nodo* nodo= (Nodo *)malloc(sizeof(Nodo));
-    nodo->op1 =new_node->op1;
-    nodo->op2 =new_node->op2;
-    nodo->res =new_node->res;
-    strcpy(nodo->operacion,new_node->operacion);
+    nodo->op.dato=d;
+    nodo->siguiente=NULL;
+    //printf("---SE HA INSERTADO UN NODO CON DATO %s\n",nodo->op.dato);
+    return nodo;
+}
+Nodo * CrearNodo_2(char * binario){
+    Nodo* nodo= (Nodo *)malloc(sizeof(Nodo));
+    strcpy(nodo->op.dato_binario,binario);
+    nodo->siguiente=NULL;
+    return nodo;
+}
+Nodo * CrearNodo_3(char * operacion){
+    Nodo* nodo= (Nodo *)malloc(sizeof(Nodo));
+    strcpy(nodo->op.operacion,operacion);
     nodo->siguiente=NULL;
     return nodo;
 }
@@ -24,27 +29,48 @@ void DestruirNodo(Nodo* nodo){
 }
 
 void Insertar_Nodo(Lista * lista,Nodo * new_node){
-    Nodo * nodo=CrearNodo(new_node);
-    if(lista->cabeza== NULL)
-        lista->cabeza=nodo;
-    else{
+    
+    if(lista->cabeza== NULL){
+        lista->cabeza= new_node;
+        lista->n_nodos=1;
+    }else{
         Nodo* puntero = lista->cabeza;
         while(puntero->siguiente){
             puntero=puntero->siguiente;
         }
-        puntero->siguiente=nodo;
+        puntero->siguiente=new_node;
+        lista->n_nodos++;
     }
-    lista->n_nodos++;
-    printf("Se ha insertado el nodo\n");
+    
+    printf("Se ha insertado el nodo %d\n",lista->n_nodos);
+    printf("hay %d Nodos\n",lista->n_nodos);
 }
 
 void mostrar_lista(Lista * lista){
-    Nodo *aux=lista->cabeza;
-    while(aux->siguiente){
-        printf("%d %s %d = %d\n",aux->op1,aux->operacion,aux->op2,aux->res);
-        aux= aux->siguiente;
+    if(!EstaVacia(lista)){
+        Nodo *aux=lista->cabeza;
+        int nodos= lista->n_nodos;
+
+        for(int i = 1;i<nodos;i++){
+            printf("------------------------------\n");
+            /*if(aux->op.dato){
+                printf("%d\n",aux->op.dato);
+                printf("DEBUGG\n");
+            }else{*/
+                printf("elemento %d : %s\n",i+1,aux->op.dato_binario);
+           // }
+            
+            
+            aux= aux->siguiente;
+        }
+        printf("------------------------------\n");
+        DestruirNodo(aux);
+    }else{
+        printf("------------------------------\n");
+        printf("Esta vacia\n");
+        printf("------------------------------\n");
     }
-    DestruirNodo(aux);
+    
 }
 
 void borrar_lista(Lista *lista){
