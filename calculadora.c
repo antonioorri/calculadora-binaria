@@ -1,348 +1,326 @@
-#include <stdio.h>
-#include<math.h>
+#include<stdio.h>
 #include<stdlib.h>
 #include<string.h>
-#define MAX 10
-#define MIN 0
-
-
-
-
-typedef struct Nodo{
-
-    int op1,op2,res;
-    char operacion[5];
-    struct Nodo * siguiente;
-}Nodo;
+typedef struct Nodo {
+    union {
+        int dato;
+        char dato_binario[9];
+        char operacion[10];
+    } contenido;
+    int tipo; // Para indicar el tipo de contenido: 0 = entero, 1 = binario, 2 = operación
+    struct Nodo *siguiente;
+} Nodo;
 
 typedef struct Lista{
-    Nodo * cabeza;
-    int n_nodos;
+	Nodo* cabeza;
 }Lista;
 
-Nodo * CrearNodo(Nodo * new_node){
-    Nodo* nodo= (Nodo *)malloc(sizeof(Nodo));
-    nodo->op1 =new_node->op1;
-    nodo->op2 =new_node->op2;
-    nodo->res =new_node->res;
-    strcpy(nodo->operacion,new_node->operacion);
-    nodo->siguiente=NULL;
-    return nodo;
-}
-int EstaVacia(Lista *lista){
-    return lista->cabeza ==NULL;
-}
+//----------------------------------------------------------------------
+//variables globales
+int memory=0;
+int format=2;// varible global para controlar el formato por defecto
+Lista* lista;
+//-----------------------------------------------------------------------
+char* entero_a_binario(int numero);
 
+Nodo* CrearNodo(int t){
+	Nodo* nodo= (Nodo *)malloc(sizeof(Nodo));
+	nodo->tipo= t;
+	nodo->siguiente = NULL;
+	return nodo;
+}
 void DestruirNodo(Nodo* nodo){
-    free(nodo);
+	free(nodo);
 }
-
-void Insertar_Nodo(Lista * lista,Nodo * new_node){
-    Nodo * nodo=CrearNodo(new_node);
-    if(lista->cabeza== NULL)
-        lista->cabeza=nodo;
-    else{
-        Nodo* puntero = lista->cabeza;
-        while(puntero->siguiente){
-            puntero=puntero->siguiente;
-        }
-        puntero->siguiente=nodo;
-    }
-    lista->n_nodos++;
-    printf("Se ha insertado el nodo\n");
-}
-
-void mostrar_lista(Lista * lista){
-    Nodo *aux=lista->cabeza;
-    while(aux->siguiente){
-        printf("%d %s %d = %d\n",aux->op1,*aux->operacion,aux->op2,aux->res);
-        aux= aux->siguiente;
-    }
-    DestruirNodo(aux);
-}
-
-void borrar_lista(Lista *lista){
-    Nodo * aux=NULL;
-    while(lista->cabeza){
-         aux= lista->cabeza;
-        lista->cabeza=lista->cabeza->siguiente;
-        DestruirNodo(aux);
-    }
-}
-
-
-
-void mostrar_menu1(){
-    printf("---------------------------------------------------------------------------------------------------------\n");
-    printf("Seleccione una operacion.\n");
-	printf("1.-OR lógico\n");
-	printf("2.-AND lógico\n");
-	printf("3.-XOR lógico\n");
-	printf("4.-<<(desplazamiento a la izquierda)\n");
-	printf("5.->>(desplazamiento a la derecha)\n");
-}
-void mostrar_menu2(){
-	printf("6.Cambio de formato (0->binario, 1->hexadecimal). Una vez seleccionado un formato determinado, los operandos se interpretarán en ese nuevo formato, al igual que los resulatados.\n");
-	printf("7.-Habilitar memoria.\n");
-	printf("8.-Deshabilitar memoria.\n");
-	printf("9.-Borrar memoria.\n");
-	printf("10.-Mostrar el contenido de la memoria.\n");
-	printf("0.-SALIR\n");
-	printf("---------------------------------------------------------------------------------------------------------\n");
-}
-
-int binario_decimal(int x){
-    int i=0;
-    int res=0;
-    while(x>0){
-        res+=(x%2) * pow(2,i);
-        x=x/10;
-        i++;
-    }
-    return res;
-}
-
-int decimal_binario(int x){
-    if(x==0)return x;
-    else return decimal_binario(x/2) * 10 + x%2;
-}
-
-void leer_operandos(int *n1, int *n2){
-    printf("Introduzca operando 1: \n");
-    scanf("%d",n1);
-  //  printf("%d\n",*n1);
-    printf("Introduzca operando 2: \n");
-    scanf("%d",n2);
-  //  printf("%d\n",*n2);
-}
-
-void leer_operandos_x(int *n1, int *n2){
-    printf("Introduzca operando 1: \n");
-    scanf("%x",n1);
-  //  printf("%d\n",*n1);
-    printf("Introduzca operando 2: \n");
-    scanf("%x",n2);
-  //  printf("%d\n",*n2);
-}
-
-
-void calculadora_1(int seleccionado, int x, int y, int  res,Lista * l,int m){
-
-    switch(seleccionado){
-			case 1:
-			  //  printf("%d\n",y);printf("%d\n",x);
-			    res= (x | y);
-                printf("%d OR %d = %d .\n",x,y,res);
-			break;
-			case 2:
-                res= x & y;
-                printf("%d AND %d = %d.\n",x,y,res);
-            break;
-			case 3:
-			    res= x ^ y;
-                printf("%d XOR %d = %d.\n",x,y,res);
-
-			break;
-			case 4:
-                res= x << y;
-                printf("%d << %d = %d.\n",x,y,res);
-			break;
-			case 5:
-                res= x >> y;
-                printf("%d >> %d = %d.\n",x,y,res);
-			break;
-
-			default:
-				seleccionado =  0;
-				printf("Hasta pronto :).\n");
-			break;
-		}
-		if(m && seleccionado){
-                Nodo *n;
-                n->op1=x;
-                n->op2=y;
-                n->res=res;
-                if(seleccionado==1)
-                    strcpy(n->operacion,"OR");
-                if(seleccionado==2)
-                    strcpy(n->operacion,"AND");
-                if(seleccionado==3)
-                    strcpy(n->operacion,"XOR");
-                if(seleccionado==4)
-                    strcpy(n->operacion,"<<");
-                else strcpy(n->operacion,">>");
-
-                Insertar_Nodo(l,n);
-		}
-}
-
-
-void calculadora_2(int seleccionado, int x, int y, int  res,Lista * l,int m){
-
-    int n1=binario_decimal(x);
-    int n2=binario_decimal(y);
-    switch(seleccionado){
-			case 1:
-			  //  printf("%d\n",y);printf("%d\n",x);
-			    res= (n1 | n2);
-			    res=decimal_binario(res);
-                printf("0b%d OR 0b%d = 0b%d .\n",x,y,res);
-			break;
-			case 2:
-                res= n1 & n2;
-                res=decimal_binario(res);
-                printf("0b%d AND 0b%d = 0b%d.\n",x,y,res);
-            break;
-			case 3:
-			    res= n1 ^ n2;
-			    res=decimal_binario(res);
-                printf("0b%d XOR 0b%d = 0b%d.\n",x,y,res);
-
-			break;
-			case 4:
-                res= n1 << n2;
-                res=decimal_binario(res);
-                printf("0b%d << 0b%d = 0b%d.\n",x,y,res);
-			break;
-			case 5:
-                res= n1 >> n2;
-                res=decimal_binario(res);
-                printf("0b%d >> 0b%d = 0b%d.\n",x,y,res);
-			break;
-			default:
-				seleccionado =  0;
-				printf("Hasta pronto :).\n");
-			break;
-		}
-		if(m && seleccionado){
-                Nodo *n;
-                n->op1=n1;
-                n->op2=n2;
-                n->res=res;
-                if(seleccionado==1)
-                    strcpy(n->operacion,"OR");
-                if(seleccionado==2)
-                    strcpy(n->operacion,"AND");
-                if(seleccionado==3)
-                    strcpy(n->operacion,"XOR");
-                if(seleccionado==4)
-                    strcpy(n->operacion,"<<");
-                else strcpy(n->operacion,">>");
-
-                Insertar_Nodo(l,n);
-		}
-}
-
-void calculadora_3(int seleccionado, int x, int y, int  res,Lista * l,int m){
-
-    switch(seleccionado){
-			case 1:
-			  //  printf("%d\n",y);printf("%d\n",x);
-			    res= (x | y);
-                printf("0x%x OR 0x%x = 0x%x .\n",x,y,res);
-			break;
-			case 2:
-                res= x & y;
-                printf("0x%x AND 0x%x = 0x%x.\n",x,y,res);
-            break;
-			case 3:
-			    res= x ^ y;
-                printf("0x%x XOR 0x%x = 0x%x.\n",x,y,res);
-
-			break;
-			case 4:
-                res= x << y;
-                printf("0x%x << 0x%x = 0x%x.\n",x,y,res);
-			break;
-			case 5:
-                res= x >> y;
-                printf("0x%x >> 0x%x = 0x%x.\n",x,y,res);
-			break;
-		}
-		if(m && seleccionado){
-                Nodo *n;
-                n->op1=x;
-                n->op2=y;
-                n->res=res;
-                if(seleccionado==1)
-                    strcpy(n->operacion,"OR");
-                if(seleccionado==2)
-                    strcpy(n->operacion,"AND");
-                if(seleccionado==3)
-                    strcpy(n->operacion,"XOR");
-                if(seleccionado==4)
-                    strcpy(n->operacion,"<<");
-                else strcpy(n->operacion,">>");
-
-                Insertar_Nodo(l,n);
-		}
-}
-
-int main(){
-    Lista * l=NULL;
-
-
-	int seleccionado=1;
-	int x,y,res,base,memoria=0;
-	//mostrar_menu();
-	while(seleccionado){
-
-		mostrar_menu1();
-		mostrar_menu2();
-		do{
-            printf("Introduzca operacion: ");
-			scanf("%d",&seleccionado);
-			if(seleccionado<MIN || seleccionado >MAX){
-                printf("ERROR. Vuelva a introducir la opercacion.\n");
-			}
-		}while(seleccionado<MIN || seleccionado >MAX);
-		if(seleccionado && seleccionado<6){//por si es 0
-           leer_operandos(&x,&y);
-          // printf("%d\n",y);printf("%d\n",x);
-          calculadora_1(seleccionado,x,y,res,l,memoria);
-        }
-
-        if(seleccionado==6){
-            do{
-                    printf("Seleccione el nuevo formato(0-> binario, 1-> hexadecimal: \n");
-                    scanf("%d",&base);
-                    if(!(base ==0 || base ==1)){printf("ERROR. Formato no valido");}
-			    }while(!(base==0 || base==1));
-            if(base==0){
-                leer_operandos(&x,&y);
-                do{
-
-                    mostrar_menu1();
-                    scanf("%d",&seleccionado);
-                    if(seleccionado<MIN || seleccionado >5){
-                        printf("ERROR. Vuelva a introducir la opercacion.\n");
-                    }
-                }while(seleccionado<MIN || seleccionado >5);
-                calculadora_2(seleccionado,x,y,res,l,memoria);
-            }else{
-                leer_operandos_x(&x,&y);
-                mostrar_menu1();
-                scanf("%d",&seleccionado);
-                calculadora_3(seleccionado,x,y,res,l,memoria);
-            }
-        }else{
-            switch(seleccionado){
-                case 7:
-                    memoria=1;
-                    printf("Se ha habilitado la memoria.\n");
-                break;
-                case 8:
-                    memoria=0;
-                    printf("Se ha deshabilitado la memoria.\n");
-                break;
-                case 9:
-                    borrar_lista(l);
-                break;
-                case 10:
-                    mostrar_lista(l);
-                break;
-            }
-        }
+void InsertarPrincipio(Lista* lista, int res){
+	Nodo* nodo= CrearNodo(format);
+	nodo->siguiente = lista->cabeza;
+	lista->cabeza = nodo;
+	
+	if(format==2 || format == 1){
+		nodo->contenido.dato = res; // Asignamos un valor entero
+		nodo->tipo=0;
+	}else if (format==0){
+		char * n_binary = entero_a_binario(res);
+		strcpy(nodo->contenido.dato_binario, n_binary); // Asignamos un valor binario
+		nodo->tipo=1;
 	}
+}
+void InsertarPrincipio_Operacion(Lista* lista,char *operacion){
+	Nodo* nodo= CrearNodo(2);	
+	nodo->siguiente= lista->cabeza;
+	lista->cabeza = nodo;
+	nodo->tipo = 2; // Establecemos el tipo como operacion	
+	strcpy(nodo->contenido.operacion, operacion); // Asignamos un valor binario
+}
+
+int EstaVacia(Lista* lista){
+	return lista->cabeza== NULL;
+}
+void EliminarLista(Lista* lista){
+	while(!EstaVacia(lista)){
+		Nodo* eliminado= lista->cabeza;
+		lista->cabeza=lista->cabeza->siguiente;
+		DestruirNodo(eliminado);
+	}
+}
+void imprimir_lista(Lista* lista) {
+	if(!EstaVacia(lista)){
+		Nodo *tmp = lista->cabeza;
+    	while (tmp != NULL) {
+        // Dependiendo del tipo de contenido, imprimimos de manera adecuada
+        if (tmp->tipo == 0) {
+            printf("%d \n", tmp->contenido.dato); // Imprimimos el dato como entero
+        } else if (tmp->tipo == 1) {
+            printf("%s \n", tmp->contenido.dato_binario); // Imprimimos el dato como cadena binaria
+        } else if (tmp->tipo == 2) {
+            printf("%s \n",tmp->contenido.operacion); // Imprimimos el dato como cadena de operación
+        }
+        tmp = tmp->siguiente;
+    }
+    printf("\n");
+	}else{
+		printf("Esta vacia\n");
+	}
+	
+}
+
+//int convertToBinary();
+void print_line();
+char* entero_a_binario(int numero);
+char* or_binario(const char* binario1, const char* binario2);
+char* and_binario(const char* binario1, const char* binario2);
+char* xor_binario(const char* binario1, const char* binario2);
+void print_menu(){
+	print_line();
+	printf("1.-OR logico\n");
+	printf("2.-AND logico\n");
+	printf("3.-XOR logico\n");
+	printf("4.-<< (desplazamiento a la izquierda)\n");
+	printf("5.->> (desplazamiento a la derecha)\n");
+	printf("6.-Cambio de formato(0-> binario, 1-> hexadecimal). Una vez seleccionado un formato\n   determinado, los operandos se intepretaran en ese nuevo formato, al igual que los resultados.\n");
+	printf("7.- Habilitar memoria\n");
+	printf("8.- Deshabilitar memoria\n");
+	printf("9.- Borrar memoria\n");
+	printf("10.- Mostrar el contenido de la memoria\n");
+	printf("0.- Salir\n");
+	printf("Seleccione un operando: ");
+}
+void print_line(){
+	for(int i =0; i<50;i++){
+		printf("-");
+	}
+	printf("\n");
+}
+void leer_operador(int *operador){
+	scanf("%d", operador);
+}
+void leer_operandos(int *o1, int *o2){
+	printf("Introduce 2 numeros: ");
+	if(format==2){//entero
+		scanf("%d%d",o1,o2);
+	}else if(format ==1){//hexadecimal
+		scanf("%x%x",o1,o2);
+	}else{//binario
+		scanf("%d%d",o1,o2);
+	}
+}
+void logic_or(int o1,int o2){
+	int res=o1 | o2;
+	if(format==2){
+		printf("%d or %d = %d\n\n",o1,o2,res);
+	}else if(format ==1){
+		printf("%x or %x = %x\n\n",o1,o2,res);
+	}else{
+		char * res = or_binario(entero_a_binario(o1),entero_a_binario(o2));
+		printf("%s or %s = %s\n\n",entero_a_binario(o1),entero_a_binario(o2),res);
+	}
+	if(memory==1){
+		InsertarPrincipio(lista,res);
+	}
+}
+void logic_and(int o1,int o2){
+		int res=o1 & o2;
+		if(format==2){
+		printf("%d and %d = %d\n\n",o1,o2,res);
+		}else if(format ==1){
+			printf("%x and %x = %x\n\n",o1,o2,res);
+		}else{
+			char * res = and_binario(entero_a_binario(o1),entero_a_binario(o2));
+			printf("%s and %s = %s\n\n",entero_a_binario(o1),entero_a_binario(o2),res);
+		}
+	if(memory==1){
+		InsertarPrincipio(lista,res);
+	}
+}
+void exclusive_or(int o1,int o2){
+	int res=o1 ^ o2;
+	if(format==2){
+		printf("%d xor %d = %d\n\n",o1,o2,res);		
+	}else if(format ==1){
+		printf("%x xor %x = %x\n\n",o1,o2,res);
+	}else{
+		char * res = xor_binario(entero_a_binario(o1),entero_a_binario(o2));
+		printf("%s xor %s = %s\n\n",entero_a_binario(o1),entero_a_binario(o2),res);
+	}
+	if(memory==1){
+		InsertarPrincipio(lista,res);
+	}
+}
+
+void desplazamiento_izquierda(int o1,int o2){
+	int res=o1 << o2;
+	//printf("%d << %d = %d\n\n",o1,o2,res);
+		if(format==2){
+		printf("%d << %d = %d\n\n",o1,o2,res);
+		}else if(format ==1){
+			printf("%x << %x = %x\n\n",o1,o2,res);
+		}else{
+			printf("%s << %s = %s\n\n",entero_a_binario(o1),entero_a_binario(o2),entero_a_binario(res));
+		}
+	if(memory==1){
+		InsertarPrincipio(lista,res);
+	}
+}
+void desplazamiento_derecha(int o1,int o2){
+	int res=o1 >> o2;
+	if(format==2){
+		printf("%d >> %d = %d\n\n",o1,o2,res);
+	}else if(format ==1){
+		printf("%x >> %x = %x\n\n",o1,o2,res);
+	}else{
+		printf("%s >> %s = %s\n\n",entero_a_binario(o1),entero_a_binario(o2),entero_a_binario(res));
+	}
+	if(memory==1){
+		InsertarPrincipio(lista,res);
+	}
+}
+void change_format(int *format){
+	printf("introduzca el nuevo formato (0->binary, 1->hexadecimal, 2-> decimal): ");
+	scanf("%d",format);
+	if(memory==1){
+		InsertarPrincipio_Operacion(lista,"Format");
+	}
+}
+char* entero_a_binario(int numero) {
+    // Crear un arreglo de caracteres para almacenar el número binario
+    char *binario = (char*)malloc(9 * sizeof(char)); // 8 bits + '\0'
+    binario[8] = '\0'; // Añadir el caracter nulo al final de la cadena
+    // Convertir el número entero a binario
+    int indice = 7; // Empezamos desde el bit más significativo
+    while (indice >= 0) {
+        binario[indice] = (numero & 1) ? '1' : '0'; // Obtener el bit menos significativo
+        numero >>= 1; // Desplazar el número hacia la derecha
+        indice--;
+    }
+    return binario;
+}
+char* or_binario(const char* binario1, const char* binario2) {
+    // Crear un arreglo de caracteres para almacenar el resultado
+    char *resultado = (char*)malloc(9 * sizeof(char)); // 8 bits + '\0'
+    resultado[8] = '\0'; // Añadir el caracter nulo al final de la cadena
+
+    // Realizar la operación OR bit a bit
+    for (int i = 0; i < 8; i++) {
+        // Si al menos uno de los bits es '1', el resultado es '1', de lo contrario es '0'
+        resultado[i] = (binario1[i] | binario2[i] );
+    }
+    return resultado;
+}
+char* and_binario(const char* binario1, const char* binario2) {
+    // Crear un arreglo de caracteres para almacenar el resultado
+    char *resultado = (char*)malloc(9 * sizeof(char)); // 8 bits + '\0'
+    resultado[8] = '\0'; // Añadir el caracter nulo al final de la cadena
+    // Realizar la operación OR bit a bit
+    for (int i = 0; i < 8; i++) {
+        // Si al menos uno de los bits es '1', el resultado es '1', de lo contrario es '0'
+        resultado[i] = (binario1[i] & binario2[i] );
+    }
+    return resultado;
+}
+char* xor_binario(const char* binario1, const char* binario2) {
+    // Crear un arreglo de caracteres para almacenar el resultado
+    char *resultado = (char*)malloc(9 * sizeof(char)); // 8 bits + '\0'
+    resultado[8] = '\0'; // Añadir el caracter nulo al final de la cadena
+    // Realizar la operación OR bit a bit
+    for (int i = 0; i < 8; i++) {
+        // Si al menos uno de los bits es '1', el resultado es '1', de lo contrario es '0'
+        resultado[i] = (binario1[i] ^ binario2[i] );
+    }
+    return resultado;
+}
+int main(){
+	print_menu();
+	int operador;
+	int operando1,operando2;
+	int res;
+	leer_operador(&operador);
+	//Nodo* nodo= (Nodo *)malloc(sizeof(Nodo));
+	lista =  (Lista *)malloc(sizeof(Lista));
+	lista->cabeza=NULL;
+	//printf("%d",operador);
+	while(operador!=0){
+		switch (operador)
+		{
+		case 1:
+			leer_operandos(&operando1,&operando2);
+			logic_or(operando1,operando2);
+			break;
+		case 2:
+			leer_operandos(&operando1,&operando2);
+			logic_and(operando1,operando2);
+			break;
+		case 3:
+			leer_operandos(&operando1,&operando2);
+			exclusive_or(operando1,operando2);
+			break;
+		case 4:
+			leer_operandos(&operando1,&operando2);
+			desplazamiento_izquierda(operando1,operando2);
+			break;
+		case 5:
+			leer_operandos(&operando1,&operando2);
+			desplazamiento_derecha(operando1,operando2);
+			break;
+		case 6:
+			change_format(&format);
+			printf("new format: %d\n",format);
+			break;
+		case 7://habilitar memoria
+			if(memory==0){
+				memory=1;
+				//head = malloc(sizeof(node));
+				printf("Memoria habilitada.\n");
+			}else{
+				printf("Memoria ya habilitada.\n");
+			}
+			break;
+		case 8://deshabilitar memoria
+			if(memory==0){
+				printf("La memoria ya está desabilitada.\n");
+			}else{
+				if(memory==1){
+				InsertarPrincipio_Operacion(lista,"memory");
+				}
+				memory=0;
+			}
+			break;
+		case 9:
+			EliminarLista(lista);
+			break;
+		case 10:
+			imprimir_lista(lista);
+			if(memory==1){
+				//save_operacion("imprimir");
+			}
+			break;
+		default:
+		printf("Error, operador incorrecto.\n");
+			break;
+		}
+		//print_menu();
+		leer_operador(&operador);
+	}
+	EliminarLista(lista);
 	return 0;
 }
